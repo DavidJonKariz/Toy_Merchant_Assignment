@@ -8,12 +8,6 @@ package toy_merchant_assignment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -22,9 +16,6 @@ import java.util.logging.Logger;
 public class SocketGUI extends javax.swing.JFrame {
     SocketServer socketServer;
     SocketClient  socketClient;
-    private Socket socket = null;
-    private DataInputStream clientInput = null;
-    private DataOutputStream GUIOutput = null;
 
     /**
      * Creates new form SokcetFrame
@@ -57,6 +48,7 @@ public class SocketGUI extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -97,6 +89,13 @@ public class SocketGUI extends javax.swing.JFrame {
             }
         });
 
+        jButton4.setText("Test");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -108,9 +107,6 @@ public class SocketGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(62, 62, 62)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
@@ -135,7 +131,12 @@ public class SocketGUI extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
                             .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton4)
+                        .addGap(162, 162, 162))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -164,10 +165,15 @@ public class SocketGUI extends javax.swing.JFrame {
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
-                .addGap(25, 25, 25)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(25, 25, 25)
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(8, 8, 8)
+                        .addComponent(jButton4)))
                 .addGap(30, 30, 30))
         );
 
@@ -222,11 +228,12 @@ public class SocketGUI extends javax.swing.JFrame {
                 public void actionPerformed(ActionEvent e) {
                     Thread athread = new Thread(){
                         public void run(){
-                            socketClient.GUIserverInput(jTextArea1, jTextField1.getText() + "\n");
+                            checkClient(jTextField1.getText());
+                            socketClient.GUIserverInput(jTextArea1, jTextField1.getText(), SocketGUI.this);
                         }
                     };
                     athread.start();
-                    throw new UnsupportedOperationException("Not supported yet.");
+//                    throw new UnsupportedOperationException("Not supported yet.");
                 }
             });
         }catch(Exception e){
@@ -239,7 +246,10 @@ public class SocketGUI extends javax.swing.JFrame {
         {
             Thread thread = new Thread(){
                 public void run(){
-                    socketClient.GUIserverInput(jTextArea1, jTextField1.getText() + "\n");
+                    if(!checkClient(jTextField1.getText()))
+                    {
+                        socketClient.GUIserverInput(jTextArea1, jTextField1.getText() + "\n", SocketGUI.this);
+                    }
                 }
             };
             thread.start();
@@ -247,7 +257,25 @@ public class SocketGUI extends javax.swing.JFrame {
             System.out.println(e);
         }   
     }//GEN-LAST:event_client_input
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+//        JOptionPane errorPane = new JOptionPane("The Server Connection is Being Closed.", JOptionPane.WARNING_MESSAGE);
+//        JDialog errorDialog = errorPane.createDialog("Closing Connection");
+//        errorDialog.setAlwaysOnTop(true);
+//        errorDialog.setVisible(true);
+        SocketGUI.this.dispatchEvent(new WindowEvent(SocketGUI.this, WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_jButton4ActionPerformed
     
+    public boolean checkClient(String clientInput)
+    {
+        if(clientInput == null || clientInput.isEmpty())
+        {
+            System.out.println("Blank Client Input.");
+            socketClient.GUIcloseConnection(jTextArea1, SocketGUI.this);
+            return true;
+        }
+        return false;
+    }
     /**
      * @param args the command line arguments
      */
@@ -291,6 +319,7 @@ public class SocketGUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

@@ -5,8 +5,13 @@
  */
 package toy_merchant_assignment;
 
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -79,16 +84,29 @@ public class SocketClient {
     }
     
     // connection closed for the GUI
-    public void GUIcloseConnection(javax.swing.JTextArea theTextArea)
+    public void GUIcloseConnection(javax.swing.JTextArea theTextArea, javax.swing.JFrame theFrame)
     {
+        JOptionPane errorPane = new JOptionPane("The Server Connection is Being Closed.", JOptionPane.WARNING_MESSAGE);
+        JDialog errorDialog = errorPane.createDialog("Closing Connection");
+        errorDialog.setAlwaysOnTop(true);
+        errorDialog.setVisible(true);
+        int option = JOptionPane.showConfirmDialog(theFrame, "Are you sure you want to exit?",
+                "Exit Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if(option == JOptionPane.YES_OPTION)
+        {
+            theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
+        }
         try
         {
             theTextArea.append("Connection Closure\n");
+            socket.close();
             serverInput.close();
             serverOutput.close();
-            socket.close();
+            theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
         } catch(IOException i) {
-            System.out.println(i);
+            Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, i);
+        }  catch(Exception e) {
+            Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     
@@ -115,25 +133,19 @@ public class SocketClient {
     }
     
     //Signal Server Input for the GUI
-    public void GUIserverInput(javax.swing.JTextArea theTextArea, String text)
+    public void GUIserverInput(javax.swing.JTextArea theTextArea, String text, javax.swing.JFrame theFrame)
     {
-//        PrintWriter writer = new PrintWriter(System.out);
         if(text.equals("Done"))
         {
-            GUIcloseConnection(theTextArea);
+            GUIcloseConnection(theTextArea, theFrame);
         }
-            try
-            {
-                if(text != null)
-                {
-                    serverOutput.writeUTF(text);
-//                    writer.write(text);
-                    theTextArea.append("Client: " + text);
-//                    writer.flush(); 
-                }
-            } catch(IOException i) {
-                System.out.println(i);
-            }
+        try
+        {
+            serverOutput.writeUTF(text);
+            theTextArea.append("Client: " + text + "\n\n");
+        } catch(IOException i) {
+            System.out.println(i);
+        }
         
     }
     

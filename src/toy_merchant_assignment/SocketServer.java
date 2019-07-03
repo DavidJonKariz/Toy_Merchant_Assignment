@@ -5,9 +5,12 @@
  */
 package toy_merchant_assignment;
 
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -60,8 +63,9 @@ public class SocketServer extends Thread{
             // close socket connection
             System.out.println("Connection is Being Closed...");
             System.out.println(info);
-            socket.close();
-            clientInput.close();
+//            socket.close();
+//            clientInput.close();
+            closeServer();
         } catch(IOException i) {
             System.out.println(i);
         }
@@ -73,18 +77,19 @@ public class SocketServer extends Thread{
         try {
             server = new ServerSocket(port);
             theTextArea.setText(outputLine);
-//            outputLine = "Server Initialized.\nWaiting for Client to connect.......\n";
             theTextArea.append("Server Initialized.\nWaiting for Client to connect.......\n");
+            
             // Client accepts connection
             socket = server.accept();
-//            outputLine += "Client Accepted\n";
-            theTextArea.append("Client Accepted\n");
+            theTextArea.append("Client Accepted\n\n");
             
             // Client input
             clientInput = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             
             SocketProtocol sp = new SocketProtocol();
-            theTextArea.append("Server: " + sp.processInput(null));
+            outputLine = sp.processInput(null);
+            theTextArea.append("Server: " + outputLine + "\n");
+            System.out.println("Server: " + outputLine + "\n");
             // reads Client messages
             while(!line.equals("Done"))
             {
@@ -92,12 +97,13 @@ public class SocketServer extends Thread{
                 {
                     if(line == null)
                     {
-                        System.out.println("No Further Input Required. Exit Please.");
+                        System.out.println("No Input Given. Please try Again.");
                     }
                     line = clientInput.readUTF();
-                    info.add(line);
                     System.out.println("Client: " + line);
-                    theTextArea.append("Server: " + sp.processInput(line));
+                    outputLine = sp.processInput(line);
+                    theTextArea.append("Server: " + outputLine + "\n");
+                    System.out.println("Server: " + outputLine + "\n");
                     if(!line.equals("Done"))
                         info.add(line);
                 } catch(IOException i) {
@@ -107,11 +113,37 @@ public class SocketServer extends Thread{
             
             // close socket connection
             theTextArea.append("Connection is Being Closed...");
-//            System.out.println("Connection is Being Closed...");
-            socket.close();
-            clientInput.close();
+            System.out.println("Connection is Being Closed...");
+            closeServer();
         } catch(IOException i) {
             System.out.println(i);
+        }
+    }
+    
+    public void closeServer()
+    {
+        try {
+            socket.close();
+            server.close();
+            clientInput.close();
+        } catch (IOException ex) {
+            Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, ex);
+        }  catch(Exception e) {
+            Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
+    
+    public void GUIcloseServer(javax.swing.JFrame theFrame)
+    {
+        try {
+            socket.close();
+            server.close();
+            clientInput.close();
+//            theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
+        } catch (IOException ex) {
+            Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, ex);
+        }  catch(Exception e) {
+            Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     

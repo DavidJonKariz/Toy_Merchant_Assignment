@@ -14,37 +14,37 @@ public class SocketProtocol {
     public String processInput(String theInput) {
         String theOutput = null;
         if(theInput == null){
-            theOutput = "Toy code\n";
+            theOutput = "Submit a Toy code\n";
         }
         if(count == 1){
-            theOutput = "Toy name\n";
+            theOutput = "Submit a Toy name\n";
         }
         else if(count == 2){
-            theOutput = "Toy Description\n";
+            theOutput = "Submit the Toy Description\n";
         }
         else if(count == 3){
-            theOutput = "Toy Price\n";
+            theOutput = "Submit the Toy Price\n";
         }
         else if(count == 4){
-            theOutput = "Date of Manufacture\n";
+            theOutput = "Submit the Date of Manufacture\n";
         }
         else if(count == 5){
-            theOutput = "Batch Number\n";
+            theOutput = "Submit the Batch Number\n";
         }
         else if(count == 6){
-            theOutput = "Company Name\n";
+            theOutput = "Submit the Company Name\n";
         }
         else if(count == 7){
-            theOutput = "Street Adress\n";
+            theOutput = "Submit the Street Address\n";
         }
         else if(count == 8){
-            theOutput = "Zip Code\n";
+            theOutput = "Submit the Zip Code\n";
         }
         else if(count == 9){
-            theOutput = "Country\n";
+            theOutput = "Submit the Country of Location\n";
         }
         else if(count == 10){
-            theOutput = "Message\n";
+            theOutput = "Submit a Message\n";
         }
         else if(count == 11){
             theOutput = "Thank You for Your Input.\n";
