@@ -224,13 +224,14 @@ public class SocketTabbedGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2start_server(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2start_server
+        jTextArea1.setLineWrap(rootPaneCheckingEnabled);
         try
         {
             socketServer = new SocketServer();
             socketServer.setServerPort(Integer.parseInt(jTextField3.getText()));
             Thread thread = new Thread(){
                 public void run(){
-                    socketServer.GUIserverConnection(jTextArea1);
+                    socketServer.GUIserverConnection(jTextArea1, SocketTabbedGUI.this);
                 }
             };
             thread.start();
@@ -251,7 +252,7 @@ public class SocketTabbedGUI extends javax.swing.JFrame {
             socketClient.setPort(Integer.parseInt(jTextField4.getText()));
             Thread thread = new Thread(){
                 public void run(){
-                    socketClient.GUIstartConnection(jTextArea1);
+                    socketClient.GUIstartConnection(jTextArea1, SocketTabbedGUI.this);
                 }
             };
             thread.start();

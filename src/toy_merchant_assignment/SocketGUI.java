@@ -8,6 +8,7 @@ package toy_merchant_assignment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -196,13 +197,14 @@ public class SocketGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     
     private void start_server(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_start_server
+        jTextArea1.setLineWrap(true);
         try
         {
             socketServer = new SocketServer();
             socketServer.setServerPort(Integer.parseInt(jTextField3.getText()));
             Thread thread = new Thread(){
                 public void run(){
-                    socketServer.GUIserverConnection(jTextArea1);
+                    socketServer.GUIserverConnection(jTextArea1, SocketGUI.this);
                 }
             };
             thread.start();
@@ -219,7 +221,7 @@ public class SocketGUI extends javax.swing.JFrame {
             socketClient.setPort(Integer.parseInt(jTextField4.getText()));
             Thread thread = new Thread(){
                 public void run(){
-                    socketClient.GUIstartConnection(jTextArea1);
+                    socketClient.GUIstartConnection(jTextArea1, SocketGUI.this);
                 }
             };
             thread.start();
@@ -230,10 +232,10 @@ public class SocketGUI extends javax.swing.JFrame {
                         public void run(){
                             checkClient(jTextField1.getText());
                             socketClient.GUIserverInput(jTextArea1, jTextField1.getText(), SocketGUI.this);
+                            jTextField1.setText("");
                         }
                     };
                     athread.start();
-//                    throw new UnsupportedOperationException("Not supported yet.");
                 }
             });
         }catch(Exception e){
@@ -246,16 +248,15 @@ public class SocketGUI extends javax.swing.JFrame {
         {
             Thread thread = new Thread(){
                 public void run(){
-                    if(!checkClient(jTextField1.getText()))
-                    {
-                        socketClient.GUIserverInput(jTextArea1, jTextField1.getText() + "\n", SocketGUI.this);
-                    }
+                    checkClient(jTextField1.getText());
+                    socketClient.GUIserverInput(jTextArea1, jTextField1.getText(), SocketGUI.this);
+                    jTextField1.setText("");
                 }
             };
             thread.start();
         }catch(Exception e){
             System.out.println(e);
-        }   
+        }
     }//GEN-LAST:event_client_input
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -274,7 +275,10 @@ public class SocketGUI extends javax.swing.JFrame {
             socketClient.GUIcloseConnection(jTextArea1, SocketGUI.this);
             return true;
         }
-        return false;
+        else
+        {
+            return false;
+        }
     }
     /**
      * @param args the command line arguments

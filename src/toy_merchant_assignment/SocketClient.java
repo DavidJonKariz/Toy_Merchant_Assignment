@@ -8,9 +8,9 @@ package toy_merchant_assignment;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 /**
@@ -28,6 +28,8 @@ public class SocketClient {
     // IP address and port number as arguments
     String address;
     int port;
+    // Customer Details
+    ArrayList<String> info = new ArrayList<String>();
     
     // establish connection
     public void startConnection()
@@ -50,12 +52,12 @@ public class SocketClient {
     }
     
     // establish connection for the GUI
-    public void GUIstartConnection(javax.swing.JTextArea theTextArea)
+    public void GUIstartConnection(javax.swing.JTextArea theTextArea, javax.swing.JFrame theFrame)
     {
         try
         {
             socket = new Socket(address, port);
-            theTextArea.append("Connection Established\n");
+            appendText(theTextArea, "Connection Established\n");
             
             //input
             serverInput = new BufferedReader(new InputStreamReader(System.in));
@@ -64,8 +66,16 @@ public class SocketClient {
             serverOutput = new DataOutputStream(socket.getOutputStream());
         } catch(UnknownHostException u) {
             System.out.println(u);
+            JOptionPane.showMessageDialog(theFrame, "Error", u.getMessage(), JOptionPane.WARNING_MESSAGE);
         } catch(IOException i) {
             System.out.println(i);
+            JOptionPane.showMessageDialog(theFrame,  "Error", i.getMessage(), JOptionPane.WARNING_MESSAGE);
+        } catch(NumberFormatException nfe) {
+            System.out.println(nfe);
+            JOptionPane.showMessageDialog(theFrame,  "Error", nfe.getMessage(), JOptionPane.WARNING_MESSAGE);
+        } catch(Exception e) {
+            System.out.println(e);
+            JOptionPane.showMessageDialog(theFrame,  "Error", e.getMessage(), JOptionPane.WARNING_MESSAGE);
         }
     }
     
@@ -86,27 +96,24 @@ public class SocketClient {
     // connection closed for the GUI
     public void GUIcloseConnection(javax.swing.JTextArea theTextArea, javax.swing.JFrame theFrame)
     {
-        JOptionPane errorPane = new JOptionPane("The Server Connection is Being Closed.", JOptionPane.WARNING_MESSAGE);
-        JDialog errorDialog = errorPane.createDialog("Closing Connection");
-        errorDialog.setAlwaysOnTop(true);
-        errorDialog.setVisible(true);
         int option = JOptionPane.showConfirmDialog(theFrame, "Are you sure you want to exit?",
                 "Exit Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if(option == JOptionPane.YES_OPTION)
         {
-            theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
-        }
-        try
-        {
-            theTextArea.append("Connection Closure\n");
-            socket.close();
-            serverInput.close();
-            serverOutput.close();
-            theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
-        } catch(IOException i) {
-            Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, i);
-        }  catch(Exception e) {
-            Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, e);
+            try
+            {
+                appendText(theTextArea, "Connection Closure\n");
+                socket.close();
+                serverInput.close();
+                serverOutput.close();
+                theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
+            } catch(IOException i) {
+                Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, i);
+                JOptionPane.showMessageDialog(theFrame, "Error", i.getMessage(), JOptionPane.WARNING_MESSAGE);
+            }  catch(Exception e) {
+                Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, e);
+                JOptionPane.showMessageDialog(theFrame, "Error", e.getMessage(), JOptionPane.WARNING_MESSAGE);
+            }
         }
     }
     
@@ -119,12 +126,6 @@ public class SocketClient {
             {
                 clientMsg = serverInput.readLine();
                 serverOutput.writeUTF(clientMsg);
-//                clientMsg = clientOutput.readLine();
-//                if(clientMsg != null)
-//                {
-//                    System.out.println("Client: " + clientMsg);
-//                    output.writeUTF(clientMsg);
-//                }
             } catch(IOException i) {
                 System.out.println(i);
             }
@@ -137,16 +138,56 @@ public class SocketClient {
     {
         if(text.equals("Done"))
         {
+            detailsPopup(theFrame, info);
             GUIcloseConnection(theTextArea, theFrame);
         }
         try
         {
             serverOutput.writeUTF(text);
-            theTextArea.append("Client: " + text + "\n\n");
+            info.add(text);
         } catch(IOException i) {
             System.out.println(i);
+            JOptionPane.showMessageDialog(theFrame, "Error", i.getMessage(), JOptionPane.WARNING_MESSAGE);
+        } catch(Exception e) {
+            System.out.println(e);
+            JOptionPane.showMessageDialog(theFrame, "Error", e.getMessage(), JOptionPane.WARNING_MESSAGE);
         }
         
+    }
+    
+    public void detailsPopup(javax.swing.JFrame theFrame, ArrayList<String> detailsInfo)
+    {
+        String details = "Customer Details Received\n";
+        for(int i=0; i<detailsInfo.size(); i++)
+        {
+            if (i==0) {
+                details += "Toy Code:  ";
+                details += detailsInfo.get(i);
+            } else if(i==1) {
+                details += "Toy Name:  ";
+            } else if(i==2) {
+                details += "Toy Description:  ";
+            } else if(i==3) {
+                details += "Toy Price:  ";
+            } else if(i==4) {
+                details += "Date of Manufacture:  ";
+            } else if(i==5) {
+                details += "Batch Number:  ";
+            } else if(i==6) {
+                details += "Company Name:  ";
+            } else if(i==7) {
+                details += "Street Address:  ";
+            } else if(i==8) {
+                details += "Zip Code:  ";
+            } else if(i==9) {
+                details += "Country of Location:  ";
+            } else if(i==10) {
+                details += "Message:  ";
+            }
+            details += detailsInfo.get(i);
+            details += "\n";
+        }
+        JOptionPane.showMessageDialog(theFrame, details);
     }
     
     public String getClientMsg(){return clientMsg;}
@@ -157,9 +198,19 @@ public class SocketClient {
     
     public void setPort(int thePort){ port=thePort;}
     
+    public ArrayList<String> getInfo(){return info;}
+    
+    public void setInfo(ArrayList<String> infoArray){ info=infoArray;}
+    
     public String getAddress(){return address;}
     
     public void setAddress(String theAddress){ address=theAddress;}
+    
+    public void appendText(javax.swing.JTextArea theTextArea, String str)
+    {
+        theTextArea.append(str);
+        theTextArea.setCaretPosition(theTextArea.getText().length());
+    }
     
     public static void main(String args[])
     {

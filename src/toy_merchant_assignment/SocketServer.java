@@ -5,12 +5,14 @@
  */
 package toy_merchant_assignment;
 
+import java.awt.HeadlessException;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -23,7 +25,8 @@ public class SocketServer extends Thread{
     int port;
     String line="";
     String outputLine="";
-    ArrayList<String> info = new ArrayList<String>();
+    // Customer Details
+    ArrayList<String> info = new ArrayList<>();
     
     public void serverConnection()
     {
@@ -71,52 +74,49 @@ public class SocketServer extends Thread{
         }
     }
     
-    public void GUIserverConnection(javax.swing.JTextArea theTextArea)
+    public void GUIserverConnection(javax.swing.JTextArea theTextArea, javax.swing.JFrame theFrame)
     {
         // start server connection
         try {
             server = new ServerSocket(port);
             theTextArea.setText(outputLine);
-            theTextArea.append("Server Initialized.\nWaiting for Client to connect.......\n");
+            appendText(theTextArea, "Server Initialized.\nWaiting for Client to connect.......\n");
             
             // Client accepts connection
             socket = server.accept();
-            theTextArea.append("Client Accepted\n\n");
+            appendText(theTextArea, "Client Accepted\n\n");
             
             // Client input
             clientInput = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             
             SocketProtocol sp = new SocketProtocol();
             outputLine = sp.processInput(null);
-            theTextArea.append("Server: " + outputLine + "\n");
+            appendText(theTextArea, "Server: " + outputLine);
             System.out.println("Server: " + outputLine + "\n");
+            
             // reads Client messages
             while(!line.equals("Done"))
             {
-                try
-                {
-                    if(line == null)
+                if(line == null)
                     {
                         System.out.println("No Input Given. Please try Again.");
                     }
                     line = clientInput.readUTF();
                     System.out.println("Client: " + line);
+                    appendText(theTextArea, "Client: " + line + "\n\n");
                     outputLine = sp.processInput(line);
-                    theTextArea.append("Server: " + outputLine + "\n");
+                    appendText(theTextArea, "Server: " + outputLine);
                     System.out.println("Server: " + outputLine + "\n");
-                    if(!line.equals("Done"))
-                        info.add(line);
-                } catch(IOException i) {
-                    System.out.println(i);
-                }
+                    info.add(line);
             }
             
             // close socket connection
-            theTextArea.append("Connection is Being Closed...");
+            appendText(theTextArea, "Connection is Being Closed...\n");
             System.out.println("Connection is Being Closed...");
-            closeServer();
-        } catch(IOException i) {
+            GUIcloseServer(theTextArea, theFrame);
+        } catch(IOException | HeadlessException | IllegalArgumentException i) {
             System.out.println(i);
+            JOptionPane.showMessageDialog(theFrame, "Error", i.getMessage(), JOptionPane.WARNING_MESSAGE);
         }
     }
     
@@ -133,17 +133,23 @@ public class SocketServer extends Thread{
         }
     }
     
-    public void GUIcloseServer(javax.swing.JFrame theFrame)
+    public void GUIcloseServer(javax.swing.JTextArea theTextArea, javax.swing.JFrame theFrame)
     {
+        appendText(theTextArea, "The Customer's Input: " + line);
+        appendText(theTextArea, "Connection is Being Closed...");
+        System.out.println("The Customer's Input: " + line);
+        System.out.println("Connection is Being Closed...");
         try {
             socket.close();
             server.close();
             clientInput.close();
-//            theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
+            theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
         } catch (IOException ex) {
             Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(theFrame, "Error", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
         }  catch(Exception e) {
             Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(theFrame, "Error", e.getMessage(), JOptionPane.WARNING_MESSAGE);
         }
     }
     
@@ -155,9 +161,19 @@ public class SocketServer extends Thread{
     
     public void setLine(String theServerPort){ line=theServerPort;}
     
+    public ArrayList<String> getInfo(){return info;}
+    
+    public void setInfo(ArrayList<String> infoArray){ info=infoArray;}
+    
     public String getOutputLine(){return outputLine;}
     
     public void setOutputLine(String theOutputLine){ outputLine=theOutputLine;}
+    
+    public void appendText(javax.swing.JTextArea theTextArea, String str)
+    {
+        theTextArea.append(str);
+        theTextArea.setCaretPosition(theTextArea.getText().length());
+    }
     
     public static void main(String args[])
     {
