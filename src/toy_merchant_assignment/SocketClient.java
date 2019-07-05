@@ -66,16 +66,16 @@ public class SocketClient {
             serverOutput = new DataOutputStream(socket.getOutputStream());
         } catch(UnknownHostException u) {
             System.out.println(u);
-            JOptionPane.showMessageDialog(theFrame, "Error", u.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, u.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         } catch(IOException i) {
             System.out.println(i);
-            JOptionPane.showMessageDialog(theFrame,  "Error", i.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, i.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         } catch(NumberFormatException nfe) {
             System.out.println(nfe);
-            JOptionPane.showMessageDialog(theFrame,  "Error", nfe.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, nfe.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         } catch(Exception e) {
             System.out.println(e);
-            JOptionPane.showMessageDialog(theFrame,  "Error", e.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         }
     }
     
@@ -109,10 +109,10 @@ public class SocketClient {
                 theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
             } catch(IOException i) {
                 Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, i);
-                JOptionPane.showMessageDialog(theFrame, "Error", i.getMessage(), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(theFrame, i.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
             }  catch(Exception e) {
                 Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, e);
-                JOptionPane.showMessageDialog(theFrame, "Error", e.getMessage(), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(theFrame, e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
             }
         }
     }
@@ -147,10 +147,10 @@ public class SocketClient {
             info.add(text);
         } catch(IOException i) {
             System.out.println(i);
-            JOptionPane.showMessageDialog(theFrame, "Error", i.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, i.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         } catch(Exception e) {
             System.out.println(e);
-            JOptionPane.showMessageDialog(theFrame, "Error", e.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         }
         
     }

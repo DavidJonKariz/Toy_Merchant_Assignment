@@ -116,7 +116,7 @@ public class SocketServer extends Thread{
             GUIcloseServer(theTextArea, theFrame);
         } catch(IOException | HeadlessException | IllegalArgumentException i) {
             System.out.println(i);
-            JOptionPane.showMessageDialog(theFrame, "Error", i.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, i.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         }
     }
     
@@ -146,10 +146,10 @@ public class SocketServer extends Thread{
             theFrame.dispatchEvent(new WindowEvent(theFrame, WindowEvent.WINDOW_CLOSING));
         } catch (IOException ex) {
             Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(theFrame, "Error", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         }  catch(Exception e) {
             Logger.getLogger(SocketServer.class.getName()).log(Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(theFrame, "Error", e.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(theFrame, e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
         }
     }
     
